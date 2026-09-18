@@ -1,0 +1,296 @@
+.lightbox {
+  width: 100vw;
+  max-width: none;
+  height: 100vh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  opacity: 0;
+  overflow: hidden;
+  transition: opacity 280ms ease;
+}
+
+.lightbox[open] {
+  display: grid;
+  place-items: center;
+}
+
+.lightbox::backdrop {
+  background: rgba(0, 0, 0, .94);
+}
+
+.lightbox.is-open {
+  opacity: 1;
+}
+
+.lightbox-shell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: clamp(4rem, 7vw, 6rem) clamp(1rem, 6vw, 6rem) clamp(2rem, 4vw, 4rem);
+  overflow: hidden;
+}
+
+.lightbox-media-wrapper {
+  display: contents;
+}
+
+.lightbox-image {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: calc(100vh - clamp(7rem, 12vw, 10rem));
+  object-fit: contain;
+  opacity: 0;
+  transform: translateY(18px) scale(.96);
+  transform-origin: center center;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  touch-action: none;
+  will-change: transform;
+  cursor: zoom-in;
+  transition: opacity 420ms cubic-bezier(.22, 1, .36, 1), transform 420ms cubic-bezier(.22, 1, .36, 1);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .35);
+}
+
+.lightbox.is-open .lightbox-image {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.lightbox-button {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .35);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, .4);
+  color: #fff;
+  font-family: "Manrope", sans-serif;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.lightbox-button:hover,
+.lightbox-button:focus-visible {
+  border-color: #fff;
+  background: #fff;
+  color: #000;
+  outline: none;
+  transform: scale(1.06);
+}
+
+.lightbox-close {
+  top: clamp(1rem, 2.5vw, 2rem);
+  right: clamp(1rem, 2.5vw, 2rem);
+}
+
+.lightbox-prev,
+.lightbox-next {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.lightbox-prev:hover,
+.lightbox-prev:focus-visible,
+.lightbox-next:hover,
+.lightbox-next:focus-visible {
+  transform: translateY(-50%) scale(1.06);
+}
+
+.lightbox-prev { left: clamp(.75rem, 2vw, 2rem); }
+.lightbox-next { right: clamp(.75rem, 2vw, 2rem); }
+
+.lightbox-counter {
+  position: absolute;
+  bottom: clamp(1rem, 2vw, 1.75rem);
+  left: 50%;
+  z-index: 2;
+  color: rgba(255, 255, 255, .72);
+  font-size: .78rem;
+  transform: translateX(-50%);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Zoom controls bar */
+.lightbox-zoom-bar {
+  position: absolute;
+  right: clamp(1rem, 2.5vw, 2.5rem);
+  bottom: clamp(1rem, 2vw, 1.75rem);
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  background: rgba(18, 18, 18, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.lightbox-zoom-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: "Manrope", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, opacity 150ms ease;
+  user-select: none;
+}
+
+.lightbox-zoom-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.lightbox-zoom-btn:disabled,
+.lightbox-zoom-btn.is-disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.lightbox-zoom-level {
+  min-width: 44px;
+  text-align: center;
+  font-size: 0.76rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Tooltip hint */
+.lightbox-hint {
+  position: absolute;
+  top: clamp(1.25rem, 2.5vw, 2.25rem);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: rgba(18, 18, 18, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: rgba(255, 255, 255, 0.8);
+  font-family: "Manrope", sans-serif;
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 500ms ease, transform 500ms ease;
+  white-space: nowrap;
+}
+
+.lightbox-hint.is-hidden {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-6px);
+}
+
+/* Only process strip frames are clickable / zoomable */
+.study-page .process-strip .process-frame.has-image {
+  cursor: zoom-in;
+}
+
+.study-page .process-strip .process-frame.has-image:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 4px;
+}
+
+/* Hero image and showcase images above section 1 MUST NOT have zoom-in cursor */
+.study-page .study-hero,
+.study-page .study-hero-media,
+.study-page .study-hero-media.has-image,
+.study-page .study-hero-media img,
+.study-page .study-showcase,
+.study-page .study-showcase .has-image,
+.study-page .study-showcase img,
+.study-page .showcase-stack,
+.study-page .showcase-stack .has-image,
+.study-page .showcase-stack img,
+.study-page .showcase-caption-section {
+  cursor: default !important;
+}
+
+body.is-lightbox-open {
+  overflow: hidden;
+}
+
+body.is-lightbox-open .cursor {
+  display: none !important;
+}
+
+@media (max-width: 640px) {
+  .lightbox-shell {
+    padding-right: .75rem;
+    padding-left: .75rem;
+  }
+
+  .lightbox-prev,
+  .lightbox-next {
+    top: auto;
+    bottom: 1rem;
+    transform: none;
+  }
+
+  .lightbox-prev:hover,
+  .lightbox-prev:focus-visible,
+  .lightbox-next:hover,
+  .lightbox-next:focus-visible {
+    transform: scale(1.06);
+  }
+
+  .lightbox-prev { left: 1rem; }
+  .lightbox-next { right: 1rem; }
+
+  .lightbox-counter {
+    bottom: clamp(0.75rem, 2vw, 1.25rem);
+    font-size: 0.72rem;
+    max-width: 88vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .lightbox-zoom-bar {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: clamp(2.75rem, 6vw, 3.5rem);
+  }
+
+  .lightbox-hint {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lightbox,
+  .lightbox-image,
+  .lightbox-button,
+  .lightbox-hint {
+    transition-duration: .01ms;
+  }
+}

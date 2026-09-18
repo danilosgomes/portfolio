@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Portfólio de design de produto e experiências digitais." />
+    <meta name="theme-color" content="#efefed" />
+    <title>Portfolio — Product Designer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css?v=27" />
+    <link rel="stylesheet" href="case-styles.css?v=18" />
+    <link rel="stylesheet" href="lightbox.css?v=8" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="cursor" aria-hidden="true"><span>VER</span></div>
+    <a class="skip-link" href="#main">Pular para o conteúdo</a>
+
+    <header class="site-header">
+      <a class="brand" href="#/" aria-label="Ir para o início">
+        <span class="brand-initials">DG</span>
+      </a>
+
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        <span>Menu</span>
+        <span class="menu-icon" aria-hidden="true"><i></i><i></i></span>
+      </button>
+
+      <nav class="site-nav" id="site-nav" aria-label="Navegação principal">
+        <a href="#/">Home</a>
+        <a href="#/work">Projetos</a>
+        <a href="#/about">Sobre</a>
+        <a href="mailto:gomesodanilo@gmail.com" class="nav-cta" data-email>Contato</a>
+      </nav>
+    </header>
+
+    <main id="main"></main>
+
+    <footer class="site-footer">
+      <div class="footer-kicker">Tem um projeto em mente?</div>
+      <a class="footer-cta magnetic" href="mailto:gomesodanilo@gmail.com" data-email-link>
+        <span>Vamos conversar</span>
+        <span class="arrow" aria-hidden="true">↗</span>
+      </a>
+      <div class="footer-meta">
+        <div class="footer-links">
+          <nav class="footer-nav" aria-label="Navegação do rodapé">
+            <a href="#/">Home</a>
+            <a href="#/work">Projetos</a>
+            <a href="#/about">Sobre</a>
+          </nav>
+          <a class="footer-linkedin" href="https://www.linkedin.com/in/gomesodanilo/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        </div>
+      </div>
+    </footer>
+
+    <button class="back-to-top" type="button" aria-label="Voltar ao topo" title="Voltar ao topo">
+      <span aria-hidden="true">↑</span>
+    </button>
+
+    <dialog class="image-lightbox" id="image-lightbox" aria-label="Visualização ampliada da imagem">
+      <button class="lightbox-control lightbox-close" type="button" aria-label="Fechar imagem">×</button>
+      <button class="lightbox-control lightbox-previous" type="button" aria-label="Imagem anterior">‹</button>
+      <figure class="lightbox-content">
+        <img src="" alt="" />
+        <figcaption></figcaption>
+      </figure>
+      <button class="lightbox-control lightbox-next" type="button" aria-label="Próxima imagem">›</button>
+    </dialog>
+    <script src="case-app.js?v=32"></script>
+    <script src="lightbox.js?v=10"></script>
+    <script src="process-gallery.js?v=2"></script>
+    <script src="back-to-top.js?v=1"></script>
+  </body>
+</html>
