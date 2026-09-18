@@ -83,7 +83,7 @@ function homeTemplate() {
               <div class="project-meta">${project.category} · ${project.year}</div>
               <h3 class="project-title">${project.title}</h3>
               <p class="project-description">${project.summary}</p>
-              <a class="text-link" href="#/case/${project.slug}">Ver projeto <span class="arrow">↗</span></a>
+              <a class="text-link" href="#/case/${project.slug}">Ver projeto <span class="arrow"><svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="8" x2="8" y2="2"></line><polyline points="3 2 8 2 8 7"></polyline></svg></span></a>
             </div>
           </article>
         `).join("")}
@@ -164,7 +164,7 @@ function caseTemplate(project) {
 
       <a class="next-project" href="#/case/${other.slug}">
         <span><small>Próximo projeto</small><strong>${other.title}</strong></span>
-        <span class="arrow" aria-hidden="true">↗</span>
+        <span class="arrow" aria-hidden="true"><svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="8" x2="8" y2="2"></line><polyline points="3 2 8 2 8 7"></polyline></svg></span>
       </a>
     </article>
   `;

@@ -10,87 +10,245 @@
 
     initialized.add(marquee);
 
-    let pointerId = null;
-    let startX = 0;
-    let lastX = 0;
-    let moved = false;
-    let animation = null;
-    let suppressClickUntil = 0;
+    // Cancel CSS animation so JavaScript has full, smooth control
+    track.style.animation = "none";
 
-    function getTrackAnimation() {
-      return track.getAnimations().find((item) => item.animationName === "process-gallery-scroll") || null;
+    let currentX = 0;
+    let isDragging = false;
+    let velocity = 0;
+    let moved = false;
+    let suppressClickUntil = 0;
+    let primaryWidth = primaryGroup.getBoundingClientRect().width || primaryGroup.offsetWidth || 1;
+    let rafId = null;
+
+    function updateWidth() {
+      if (primaryGroup) {
+        const w = primaryGroup.getBoundingClientRect().width || primaryGroup.offsetWidth;
+        if (w > 0) primaryWidth = w;
+      }
     }
 
-    function moveAnimation(deltaX) {
-      if (!animation) {
-        marquee.scrollLeft -= deltaX;
+    // Auto-scroll speed: approx 38px/s (negative = scroll left)
+    const baseSpeed = -0.65;
+    let lastFrameTime = performance.now();
+
+    function renderTrack() {
+      track.style.transform = `translate3d(${currentX}px, 0, 0)`;
+    }
+
+    function wrapX() {
+      if (primaryWidth <= 0) return;
+      while (currentX <= -primaryWidth) {
+        currentX += primaryWidth;
+      }
+      while (currentX > 0) {
+        currentX -= primaryWidth;
+      }
+    }
+
+    function tick(now) {
+      if (!marquee.isConnected) {
+        cancelAnimationFrame(rafId);
         return;
       }
 
-      const timing = animation.effect?.getTiming();
-      const duration = Number(timing?.duration);
-      const distance = primaryGroup.getBoundingClientRect().width;
-      if (!duration || !distance) return;
+      const dt = Math.min(now - lastFrameTime, 100);
+      lastFrameTime = now;
 
-      const currentTime = Number(animation.currentTime || 0);
-      const nextTime = currentTime - (deltaX * duration) / distance;
-      animation.currentTime = ((nextTime % duration) + duration) % duration;
-    }
+      const isLightboxOpen = document.body.classList.contains("is-lightbox-open") || 
+                             document.body.classList.contains("lightbox-open");
 
-    function finishDrag(event) {
-      if (event.pointerId !== pointerId) return;
+      if (!isDragging && !isLightboxOpen) {
+        const frameScale = dt / 16.67;
+        if (Math.abs(velocity) > 0.08) {
+          // Coasting with momentum after user swipe
+          currentX += velocity * frameScale;
+          velocity *= Math.pow(0.92, frameScale);
+        } else {
+          // Continuous marquee auto-scroll
+          velocity = 0;
+          currentX += baseSpeed * frameScale;
+        }
 
-      if (marquee.hasPointerCapture(pointerId)) {
-        marquee.releasePointerCapture(pointerId);
+        wrapX();
+        renderTrack();
       }
 
-      if (moved) suppressClickUntil = performance.now() + 350;
-      marquee.classList.remove("is-dragging");
-      pointerId = null;
-
-      if (animation && !document.body.classList.contains("is-lightbox-open")) {
-        animation.play();
-      }
+      rafId = requestAnimationFrame(tick);
     }
 
-    marquee.addEventListener("pointerdown", (event) => {
-      if (event.button !== 0 || !event.target.closest(".process-frame.has-image img")) return;
+    rafId = requestAnimationFrame(tick);
 
-      pointerId = event.pointerId;
-      startX = event.clientX;
-      lastX = event.clientX;
+    // Update width on resize and when images finish loading
+    window.addEventListener("resize", updateWidth, { passive: true });
+    marquee.querySelectorAll("img").forEach((img) => {
+      if (!img.complete) {
+        img.addEventListener("load", updateWidth, { once: true });
+      }
+    });
+    setTimeout(updateWidth, 300);
+
+    // ==========================================
+    // TOUCH HANDLING (Mobile with Directional Lock)
+    // ==========================================
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchLastX = 0;
+    let touchLastTime = 0;
+    let touchDirection = null; // null | 'horizontal' | 'vertical'
+
+    marquee.addEventListener("touchstart", (e) => {
+      if (e.touches.length !== 1) return;
+      updateWidth();
+      const t = e.touches[0];
+      touchStartX = t.clientX;
+      touchStartY = t.clientY;
+      touchLastX = t.clientX;
+      touchLastTime = performance.now();
+      touchDirection = null;
+      velocity = 0;
       moved = false;
-      animation = getTrackAnimation();
+      isDragging = false;
+    }, { passive: true });
+
+    marquee.addEventListener("touchmove", (e) => {
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0];
+      const dx = t.clientX - touchStartX;
+      const dy = t.clientY - touchStartY;
+      const absX = Math.abs(dx);
+      const absY = Math.abs(dy);
+
+      // Determine intent (horizontal swipe on images vs vertical page scroll)
+      if (touchDirection === null) {
+        if (absX < 7 && absY < 7) {
+          return; // inside tap slop deadzone
+        }
+        if (absY >= absX) {
+          touchDirection = "vertical"; // Scroll the PAGE vertically!
+        } else {
+          touchDirection = "horizontal"; // Swipe the CAROUSEL horizontally!
+          isDragging = true;
+          marquee.classList.add("is-dragging");
+        }
+      }
+
+      if (touchDirection === "vertical") {
+        // DO NOT call preventDefault!
+        // The browser natively scrolls the page smoothly without getting stuck!
+        return;
+      }
+
+      if (touchDirection === "horizontal") {
+        // User wants to swipe images horizontally: prevent vertical page jumping
+        e.preventDefault();
+        moved = true;
+
+        const deltaX = t.clientX - touchLastX;
+        const now = performance.now();
+        const dt = now - touchLastTime;
+
+        currentX += deltaX;
+        wrapX();
+        renderTrack();
+
+        if (dt > 0) {
+          const currentVel = deltaX / (dt / 16.67);
+          velocity = velocity * 0.3 + currentVel * 0.7;
+        }
+
+        touchLastX = t.clientX;
+        touchLastTime = now;
+      }
+    }, { passive: false });
+
+    function onTouchEnd() {
+      if (touchDirection === "horizontal") {
+        if (moved) {
+          suppressClickUntil = performance.now() + 350;
+        }
+        if (Math.abs(velocity) > 30) {
+          velocity = Math.sign(velocity) * 30;
+        }
+      } else {
+        velocity = 0;
+      }
+
+      touchDirection = null;
+      isDragging = false;
+      marquee.classList.remove("is-dragging");
+    }
+
+    marquee.addEventListener("touchend", onTouchEnd, { passive: true });
+    marquee.addEventListener("touchcancel", onTouchEnd, { passive: true });
+
+    // ==========================================
+    // MOUSE DRAG HANDLING (Desktop)
+    // ==========================================
+    let isMouseDown = false;
+    let mouseStartX = 0;
+    let mouseLastX = 0;
+    let mouseLastTime = 0;
+
+    marquee.addEventListener("mousedown", (e) => {
+      if (e.button !== 0) return;
+      isMouseDown = true;
+      isDragging = true;
+      moved = false;
+      mouseStartX = e.clientX;
+      mouseLastX = e.clientX;
+      mouseLastTime = performance.now();
+      velocity = 0;
+      marquee.classList.add("is-dragging");
+      updateWidth();
     });
 
-    marquee.addEventListener("pointermove", (event) => {
-      if (event.pointerId !== pointerId) return;
-
-      const totalDistance = event.clientX - startX;
-      const deltaX = event.clientX - lastX;
-
-      if (!moved && Math.abs(totalDistance) > 5) {
+    window.addEventListener("mousemove", (e) => {
+      if (!isMouseDown) return;
+      const dist = Math.abs(e.clientX - mouseStartX);
+      if (!moved && dist > 4) {
         moved = true;
-        animation?.pause();
-        marquee.setPointerCapture(pointerId);
-        marquee.classList.add("is-dragging");
       }
 
       if (moved) {
-        event.preventDefault();
-        moveAnimation(deltaX);
+        const deltaX = e.clientX - mouseLastX;
+        const now = performance.now();
+        const dt = now - mouseLastTime;
+
+        currentX += deltaX;
+        wrapX();
+        renderTrack();
+
+        if (dt > 0) {
+          const currentVel = deltaX / (dt / 16.67);
+          velocity = velocity * 0.3 + currentVel * 0.7;
+        }
       }
 
-      lastX = event.clientX;
+      mouseLastX = e.clientX;
+      mouseLastTime = performance.now();
     });
 
-    marquee.addEventListener("pointerup", finishDrag);
-    marquee.addEventListener("pointercancel", finishDrag);
+    window.addEventListener("mouseup", () => {
+      if (!isMouseDown) return;
+      isMouseDown = false;
+      isDragging = false;
+      marquee.classList.remove("is-dragging");
 
+      if (moved) {
+        suppressClickUntil = performance.now() + 350;
+      }
+      if (Math.abs(velocity) > 30) {
+        velocity = Math.sign(velocity) * 30;
+      }
+    });
+
+    // Suppress lightbox opening if the user was dragging/swiping
     marquee.addEventListener("click", (event) => {
-      if (performance.now() >= suppressClickUntil) return;
-      event.preventDefault();
-      event.stopPropagation();
+      if (performance.now() < suppressClickUntil) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
     }, true);
   }
 

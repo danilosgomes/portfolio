@@ -19,11 +19,12 @@
 }
 
 .lightbox::backdrop {
-  background: rgba(0, 0, 0, .94);
+  background: rgba(0, 0, 0, .98);
 }
 
 .lightbox.is-open {
   opacity: 1;
+  background: rgba(8, 8, 8, 0.98);
 }
 
 .lightbox-shell {
@@ -243,16 +244,23 @@ body.is-lightbox-open .cursor {
   display: none !important;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 820px) {
   .lightbox-shell {
+    padding-top: max(4.5rem, calc(env(safe-area-inset-top, 0px) + 3.75rem));
+    padding-bottom: max(4.75rem, calc(env(safe-area-inset-bottom, 0px) + 3.75rem));
     padding-right: .75rem;
     padding-left: .75rem;
+  }
+
+  .lightbox-close {
+    top: max(clamp(1rem, 2.5vw, 1.75rem), env(safe-area-inset-top, 1rem));
+    right: max(1rem, env(safe-area-inset-right, 1rem));
   }
 
   .lightbox-prev,
   .lightbox-next {
     top: auto;
-    bottom: 1rem;
+    bottom: max(1rem, env(safe-area-inset-bottom, 1rem));
     transform: none;
   }
 
@@ -263,22 +271,38 @@ body.is-lightbox-open .cursor {
     transform: scale(1.06);
   }
 
-  .lightbox-prev { left: 1rem; }
-  .lightbox-next { right: 1rem; }
+  .lightbox-prev { left: max(1rem, env(safe-area-inset-left, 1rem)); }
+  .lightbox-next { right: max(1rem, env(safe-area-inset-right, 1rem)); }
 
   .lightbox-counter {
-    bottom: clamp(0.75rem, 2vw, 1.25rem);
-    font-size: 0.72rem;
-    max-width: 88vw;
+    top: max(clamp(1.15rem, 2.8vw, 1.75rem), env(safe-area-inset-top, 1.15rem));
+    bottom: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100vw - 120px);
+    font-size: 0.78rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(18, 18, 18, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    z-index: 3;
   }
 
   .lightbox-zoom-bar {
     right: auto;
     left: 50%;
     transform: translateX(-50%);
-    bottom: clamp(2.75rem, 6vw, 3.5rem);
+    bottom: max(1.15rem, env(safe-area-inset-bottom, 1.15rem));
   }
 
   .lightbox-hint {

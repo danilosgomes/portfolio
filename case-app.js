@@ -3,7 +3,7 @@ const portfolio = {
   greeting: "Olá, eu sou o Danilo.",
   heroRole: "Product Designer (UX/UI)",
   projectsTitle: "Projetos selecionados",
-  projectsSubtitle: "Estudos de caso recentes com foco em simplificar<br />jornadas e gerar valor real.",
+  projectsSubtitle: "Estudos de caso recentes com foco em simplificar jornadas e gerar valor real.",
   heroDescription: "<strong>Product Designer (UX/UI)</strong> há mais de <strong>3 anos.</strong> Atualmente morando no Ceará. Transformo desafios complexos em experiências intuitivas, conectando as necessidades dos usuários aos objetivos do negócio.",
   role: "Product Designer (UX/UI)",
   location: "Ceará - Brasil",
@@ -143,6 +143,8 @@ function projectImage(src, alt, className = "") {
   return `<figure class="black-media has-image ${className} reveal"><img src="${src}" alt="${alt}" /></figure>`;
 }
 
+const arrowSvg = `<span class="arrow" aria-hidden="true"><svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="8" x2="8" y2="2"></line><polyline points="3 2 8 2 8 7"></polyline></svg></span>`;
+
 function paragraphs(items) {
   return items.map(item => `<p>${item}</p>`).join("");
 }
@@ -153,7 +155,7 @@ function homeTemplate() {
       <div class="hero-content reveal">
         <h1 class="hero-title" id="hero-title">${portfolio.greeting}</h1>
         <p class="hero-description">${portfolio.heroDescription}</p>
-        <a class="text-link hero-link" href="#/about">Sobre mim <span class="arrow" aria-hidden="true">↗</span></a>
+        <a class="text-link hero-link" href="#/about">Sobre mim ${arrowSvg}</a>
       </div>
     </section>
 
@@ -172,7 +174,7 @@ function homeTemplate() {
               <div class="project-meta">${project.meta || project.category}</div>
               <h3 class="project-title">${project.title}</h3>
               <p class="project-description">${project.summary}</p>
-              <a class="text-link" href="#/case/${project.slug}">Ver projeto <span class="arrow">↗</span></a>
+              <a class="text-link" href="#/case/${project.slug}">Ver projeto ${arrowSvg}</a>
             </div>
           </article>
         `).join("")}
